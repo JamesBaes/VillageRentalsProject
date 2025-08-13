@@ -4,17 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySqlConnector;
-using VillageRentalsProject.Components.Customers_Page_Components;
 using VillageRentalsProject.Models;
-
 
 namespace VillageRentalsProject.Services
 {
-    public class CustomerService
+    public class EquipmentService
     {
         protected MySqlConnection connection;
 
-        public CustomerService()
+        public EquipmentService()
         {
             string dbHost = "localhost";
             string dbUser = "root";
@@ -47,10 +45,15 @@ namespace VillageRentalsProject.Services
 
             connection.Open();
 
-            // Creating table for customers
-            string createSql = @"CREATE TABLE IF NOT EXISTS customers (
-                 
-                )";
+            // Creating table for equipment
+            string createSql = @"CREATE TABLE IF NOT EXISTS equipment (
+                equipmentId VARCHAR(255) PRIMARY KEY, 
+                categoryId VARCHAR(255), 
+                equipmentName VARCHAR(255),
+                status VARCHAR(255),
+                cost VARCHAR(255),
+                description VARCHAR(255
+                );";
 
             MySqlCommand tableCommand = new(createSql, connection);
 
@@ -61,16 +64,16 @@ namespace VillageRentalsProject.Services
         }
 
         /// <summary>
-        /// Gets the current list of customers from the database
+        /// Gets the current list of equipment from the database
         /// </summary>
-        /// <returns>Returns the current list of customers</returns>
-        public List<Customer> GetCustomers()
+        /// <returns>Returns the current list of equipment</returns>
+        public List<Equipment> GetEquipment()
         {
-            List<Customer> customers = new();
+            List<Equipment> equipmentList = new();
             try
             {
                 connection.Open();
-                string sql = "SELECT * FROM customers";
+                string sql = "SELECT * FROM equipment";
 
                 // command object for selecting from the database
                 MySqlCommand command = new(sql, connection);
@@ -79,41 +82,42 @@ namespace VillageRentalsProject.Services
                 {
                     while (reader.Read())
                     {
-                        Guid customerId = reader.GetGuid(0);
-                        string firstName = reader.GetString(1);
-                        string lastName = reader.GetString(2);
-                        string email = reader.GetString(3);
-                        string phoneNumber = reader.GetString(4);
+                        Guid equipmentId = reader.GetGuid(0);
+                        string categoryId = reader.GetString(1);
+                        string equipmentName = reader.GetString(2);
+                        string status = reader.GetString(3);
+                        string cost = reader.GetString(4);
+                        string description = reader.GetString(5);
 
-                        Customer customer = new(customerId, firstName, lastName, email, phoneNumber);
-                        customers.Add(customer);
+                        Equipment equipment = new(equipmentId, categoryId, equipmentName, status, cost, description);
+                        equipmentList.Add(equipment);
                     }
                 }
-                return customers;
+                return equipmentList;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error has occured {ex.Message}");
-                return customers;
+                return equipmentList;
             }
             finally
             {
                 connection.Close();
             }
         }
-        
+
         /// <summary>
-        /// Adds customer to the database
+        /// Adds equipment to the database
         /// </summary>
-        /// <param name="customer"></param>
-        public void AddCustomer(Customer customer)
+        /// <param name="equipment"></param>
+        public void AddEquipment(Equipment equipment)
         {
             try
             {
                 connection.Open();
 
-                string insertSql = $"INSERT INTO customers (customerId, firstName, lastName, email, phoneNumber) VALUES" +
-                    $"('{customer.CustomerId}', '{customer.FirstName}', '{customer.LastName}', '{customer.Email}', '{customer.PhoneNumber}');";
+                string insertSql = $"INSERT INTO customers (equipmentId, categoryId, equipmentName, status, cost, description) VALUES" +
+                    $"('{equipment.EquipmentId}', '{equipment.CategoryId}', '{equipment.EquipmentName}', '{equipment.Status}', '{equipment.Cost}', '{equipment.Description}');";
 
                 MySqlCommand insertCommand = new(insertSql);
 
@@ -132,16 +136,16 @@ namespace VillageRentalsProject.Services
 
 
         /// <summary>
-        /// Removes customer from database
+        /// Removes equipment from database
         /// </summary>
-        /// <param name="customer"></param>
-        public void RemoveCustomer(Customer customer)
+        /// <param name="equipment"></param>
+        public void RemoveCustomer(Equipment equipment)
         {
             try
             {
                 connection.Open();
 
-                string deleteSql = $"DELTE FROM customers WHERE customerId = '{customer.CustomerId}';";
+                string deleteSql = $"DELTE FROM equipment WHERE equipmentId = '{equipment.EquipmentId}';";
 
                 MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection);
 
@@ -153,9 +157,8 @@ namespace VillageRentalsProject.Services
             }
             finally
             {
-                connection.Close(); 
+                connection.Close();
             }
         }
-
-    } // class
-} // namespace
+    }
+}
