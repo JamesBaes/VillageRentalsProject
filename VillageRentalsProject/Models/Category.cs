@@ -8,11 +8,11 @@ namespace VillageRentalsProject.Models
 {
     public class Category
     {
-        public Guid CategoryId { get; set; }
+        public int CategoryId { get; set; }
         public string CategoryName { get; set; }
 
 
-        public Category(Guid categoryId, string categoryName)
+        public Category(int categoryId, string categoryName)
         {
             CategoryId = categoryId;
             CategoryName = categoryName;

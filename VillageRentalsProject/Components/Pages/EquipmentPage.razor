@@ -1,0 +1,39 @@
+﻿@page "/equipment"
+<div>
+	<h1>Add Equipment</h1>
+	<form>
+		<input type="text" @bind="equipmentName" required/>
+		<input type="" @bind="categoryId" required />
+		<input type="text" @bind="status" required />
+		<input type="text" @bind="cost" required />
+		<input type="text" @bind="description" required />
+		<button type="button" onclick="HandleSubmit" />
+	</form>
+</div>
+
+
+
+@code {
+
+	private Guid equipmentId = Guid.NewGuid();
+	private int categoryId;
+	private string equipmentName;
+	private string status;
+	private string cost;
+	private string description;
+
+	private bool AddEquipmentPage = false;
+
+
+	                                                      
+	public async Task HandleSubmit() 
+	{
+		EquipmentService service = new();
+		Equipment equipment = new Equipment(equipmentId, categoryId, equipmentName, status, cost, description);
+
+		service.AddEquipment(equipment);
+
+		await Task.Delay(2000);  
+	}
+
+}

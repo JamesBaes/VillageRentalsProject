@@ -83,7 +83,7 @@ namespace VillageRentalsProject.Services
                     while (reader.Read())
                     {
                         Guid equipmentId = reader.GetGuid(0);
-                        string categoryId = reader.GetString(1);
+                        int categoryId = reader.GetInt32(1);
                         string equipmentName = reader.GetString(2);
                         string status = reader.GetString(3);
                         string cost = reader.GetString(4);
