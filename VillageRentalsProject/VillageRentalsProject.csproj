@@ -68,7 +68,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\Equpiment-Page-Components\" />
+      <Folder Include="Components\Equipment-Page-Components\" />
       <Folder Include="Components\Inventory-Page-Components\" />
       <Folder Include="Components\Reports-Page-Components\" />
       <Folder Include="Components\Rentals-Page-Components\" />
