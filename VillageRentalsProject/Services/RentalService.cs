@@ -10,5 +10,7 @@ namespace VillageRentalsProject.Services
     public class RentalService
     {
         protected MySqlConnection connection; 
+
+
     }
 }
