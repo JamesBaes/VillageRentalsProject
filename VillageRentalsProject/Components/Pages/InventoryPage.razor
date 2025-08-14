@@ -1,7 +1,98 @@
 ﻿@page "/inventory"
 
-<h3>Inventory</h3>
+<div style="display: flex; justify-content: center; height: 64px; position: fixed; margin-left: -32px; top: 0; width: 100%; background-color: #CCCCCC; z-index: 1000">
+	<button type="button" @onclick="() => addEquipmentPage = true" style="height: 36px; width: 20%; border: 2px; border-radius: 4px; background-color: #215456">
+		Add Equipment
+	</button>
+	<button type="button" @onclick="() => addEquipmentPage = false" style="height: 36px; width: 20%; border: 2px; border-radius: 4px; background-color: #215456">
+		Equipment List
+	</button>
+</div>
+
+
+<div style="padding: 4px; margin-top: 64px;">
+	@if (addEquipmentPage)
+	{
+		<h1 style="color: white; text-align: center; font-weight: 600;">Add Equipment</h1>
+		<div style="display: flex; justify-content: center; align-items: center;">
+			<form style="display: flex; gap: 16px; flex-direction: column; width: 90%;">
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Equipment Name:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="equipmentName" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Category Id:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="categoryId" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Status:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="status" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Cost:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="cost" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Description:</label>
+					<input style="border: 2px; border-radius: 12px; height: 68px; width: 100%;" type="text" @bind="description" required />
+				</div>
+				<div style="display: flex; justify-content: center; align-items: center;">
+					<button style="height: 48px; background-color: forestgreen; width: 35%; border-radius: 12px; color: white;" type="submit" @onclick="HandleSubmit" > Save </button>
+				</div>
+			</form>
+		</div>
+	}
+	@if(!addEquipmentPage)
+	{
+		<h3 class="text-center">Equipment List</h3>
+		<hr />
+		@foreach (Equipment equipment in equipmentList)
+		{
+			<div>
+				<h3>$@equipment.Cost</h3>
+				<h3>@equipment.EquipmentName</h3>
+				<p>@equipment.Description</p>
+				<div> 
+					<div> 
+						<h3>Modify Equipment</h3>
+					</div>
+					<div>
+						<h3>Delete Equipment</h3>
+					</div>
+				</div>
+			</div>
+		}
+		
+	}
+</div>
+
+
 
 @code {
+
+	public List<Equipment> equipmentList = new();
+
+	private Guid equipmentId;
+	private string categoryId;
+	private string equipmentName;
+	private string status;
+	private string cost;
+	private string description;
+
+	private bool addEquipmentPage = true;
+
+
+
+	public async Task HandleSubmit() 
+	{
+		EquipmentService service = new();
+
+		Equipment equipment = new Equipment(equipmentId = Guid.NewGuid(), categoryId, equipmentName, status, cost, description);
+
+		service.AddEquipment(equipment);
+
+		await Task.Delay(2000);
+
+	}
 
 }

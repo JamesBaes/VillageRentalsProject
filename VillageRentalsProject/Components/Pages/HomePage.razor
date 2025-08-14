@@ -3,3 +3,28 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            CustomerService service = new();
+            service.InitializeCustomerDb();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Customer Database initialization failed: {ex.Message}");
+        }
+
+        try
+        {
+            EquipmentService service = new();
+            service.InitializeEquipmentDb();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Reservation initialization failed: {ex.Message}");
+        }
+    }
+}

@@ -31,9 +31,9 @@ namespace VillageRentalsProject.Services
 
 
         /// <summary>
-        /// Initialize the database for customers
+        /// Initialize the database for Equipment Inventory
         /// </summary>
-        public void InitializeCustomerDb()
+        public void InitializeEquipmentDb()
         {
             MySqlConnection tempConnection = new MySqlConnection($"Server=localhost;User ID=root;Password=password;");
             tempConnection.Open();
@@ -52,7 +52,7 @@ namespace VillageRentalsProject.Services
                 equipmentName VARCHAR(255),
                 status VARCHAR(255),
                 cost VARCHAR(255),
-                description VARCHAR(255
+                description VARCHAR(255)
                 );";
 
             MySqlCommand tableCommand = new(createSql, connection);
@@ -83,7 +83,7 @@ namespace VillageRentalsProject.Services
                     while (reader.Read())
                     {
                         Guid equipmentId = reader.GetGuid(0);
-                        int categoryId = reader.GetInt32(1);
+                        string categoryId = reader.GetString(1);
                         string equipmentName = reader.GetString(2);
                         string status = reader.GetString(3);
                         string cost = reader.GetString(4);
@@ -116,10 +116,10 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string insertSql = $"INSERT INTO customers (equipmentId, categoryId, equipmentName, status, cost, description) VALUES" +
-                    $"('{equipment.EquipmentId}', '{equipment.CategoryId}', '{equipment.EquipmentName}', '{equipment.Status}', '{equipment.Cost}', '{equipment.Description}');";
+                string insertSql = $"INSERT INTO equipment (equipmentId, categoryId, equipmentName, status, cost, description) VALUES" +
+                    $"('{equipment.EquipmentId.ToString()}', '{equipment.CategoryId}', '{equipment.EquipmentName}', '{equipment.Status}', '{equipment.Cost}', '{equipment.Description}');";
 
-                MySqlCommand insertCommand = new(insertSql);
+                MySqlCommand insertCommand = new(insertSql, connection);
 
                 insertCommand.ExecuteNonQuery();
             }

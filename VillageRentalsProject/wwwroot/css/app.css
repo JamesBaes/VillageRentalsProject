@@ -71,6 +71,14 @@ h1:focus {
     display: none;
 }
 
+.bg-color {
+    background-color: #215456;
+}
+
+.navbar-color {
+    background: linear-gradient(to bottom, #215456, #48B8BC);
+}
+
 @supports (-webkit-touch-callout: none) {
     .status-bar-safe-area {
         display: flex;
