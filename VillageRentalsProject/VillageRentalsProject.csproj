@@ -72,6 +72,7 @@
       <Folder Include="Components\Inventory-Page-Components\" />
       <Folder Include="Components\Reports-Page-Components\" />
       <Folder Include="Components\Rentals-Page-Components\" />
+      <Folder Include="wwwroot\NewFolder\" />
     </ItemGroup>
 
 </Project>

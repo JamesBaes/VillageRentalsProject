@@ -1,5 +1,161 @@
-﻿@page "/customers";
+﻿@page "/customers"
+
+<div style="position: fixed; top: 0; left: 250px; width: calc(100% - 232px); height: 64px; background-color: #CCCCCC; display: flex; justify-content: center; align-items: center; z-index: 1000;">
+	<div style="display: flex; gap: 32px;">
+		<button type="button" @onclick="ShowAddCustomerPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Add Customer
+		</button>
+		<button type="button" @onclick="ShowCustomerListPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Customer List
+		</button>
+	</div>
+</div>
+
+<div style="padding: 4px; margin-top: 64px;">
+	@if (addCustomerPage)
+	{
+		<h1 style="color: white; text-align: center; font-weight: 600;">Add Customer</h1>
+		<div style="display: flex; justify-content: center; align-items: center;">
+			<form style="display: flex; gap: 16px; flex-direction: column; width: 90%;">
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Customer First Name:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="firstName" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Customer Last Name:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="lastName" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Email:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="email" required />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Phone Number:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="phoneNumber" required />
+				</div>
+				<div style="display: flex; justify-content: center; align-items: center;">
+					<button style="height: 48px; background-color: forestgreen; width: 35%; border-radius: 12px; color: white;" type="submit" @onclick="HandleSubmit"> Save </button>
+				</div>
+			</form>
+		</div>
+	}
+	@if (customerListPage)
+	{
+		<h1 style="text-align: center; color: white; font-weight: 600;">Customer List</h1>
+		<div style="width: 100%; height: 4px; border-radius: 2px; margin-top: 16px; background-color: white;"></div>
+		<div style="width: 100%; gap: 24px;">
+			@foreach (Customer customer in customerList)
+			{
+				<div style="display: flex; flex-direction: column; padding: 12px; align-items: center; flex: 1; width: 100%; background-color: #cccccc; border-radius: 12px; border: 2px; border-color: white; margin-top: 12px;">
+					<h3 style="font-size: 18px; font-weight: 600;">Customer Id: @customer.CustomerId</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">@($"{customer.FirstName} {customer.LastName}")</h3>
+					<p style="font-size: 16px; font-weight: 500;">@customer.Email</p>
+					<div style="display: flex; flex-direction: row; gap: 24px;">
+						<button type="button" @onclick="ShowModifyCustomerPage" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: dodgerblue;">
+							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Modify Customer</h3>
+						</button>
+						<button type="button" @onclick="async () => await DeleteCustomer(customer.CustomerId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
+							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Customer</h3>
+						</button>
+					</div>
+				</div>
+			}
+		</div>
+
+	}
+
+	@if (modifyCustomerPage)
+	{
+		<h1> hello</h1>
+	}
+</div>
 
 @code {
+
+	public List<Customer> customerList = new();
+
+	private Guid customerId;
+	private string firstName;
+	private string lastName;
+	private string email;
+	private string phoneNumber;
+
+	private bool addCustomerPage = true;
+	private bool customerListPage;
+	private bool modifyCustomerPage;
+
+	private void ShowAddCustomerPage()
+	{
+		addCustomerPage = true;
+		customerListPage = false;
+		modifyCustomerPage = false;
+	}
+
+	private void ShowCustomerListPage()
+	{
+		addCustomerPage = false;
+		customerListPage = true;
+		modifyCustomerPage = false;
+	}
+
+	private void ShowModifyCustomerPage()
+	{
+		addCustomerPage = false;
+		customerListPage = false;
+		modifyCustomerPage = true;
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(100);
+		CustomerService service = new();
+
+		customerList = service.GetCustomerList();
+	}
+
+
+	public async Task HandleSubmit()
+	{
+		CustomerService service = new();
+
+		Customer customer = new Customer(customerId = Guid.NewGuid(), firstName, lastName, email, phoneNumber);
+
+		service.AddCustomer(customer);
+
+		await Task.Delay(1000);
+
+	}
+
+	public async Task DeleteCustomer(Guid id)
+	{
+		CustomerService service = new();
+
+		Customer deletedCustomer = service.GetCustomer(id);
+
+		List<Customer> updatedList = new();
+
+		if (deletedCustomer != null)
+		{
+			service.RemoveCustomer(deletedCustomer);
+
+			customerList.Remove(deletedCustomer);
+
+			// looping through current customerList.
+			// If the removed customerId is found during the iteration, it isn't added to the updated list.
+			foreach (Customer customer in customerList)
+			{
+				if (customer.CustomerId != id)
+				{
+					updatedList.Add(customer);
+				}
+			}
+		}
+
+		customerList = updatedList;
+
+		await Task.Delay(100);
+
+	}
 
 }

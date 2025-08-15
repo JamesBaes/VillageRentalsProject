@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySqlConnector;
-using VillageRentalsProject.Components.Customers_Page_Components;
 using VillageRentalsProject.Models;
 
 
@@ -49,7 +48,11 @@ namespace VillageRentalsProject.Services
 
             // Creating table for customers
             string createSql = @"CREATE TABLE IF NOT EXISTS customers (
-                 
+                customerId VARCHAR(255) PRIMARY KEY, 
+                firstName VARCHAR(255), 
+                lastName VARCHAR(255),
+                email VARCHAR(255),
+                phoneNumber VARCHAR(255)
                 )";
 
             MySqlCommand tableCommand = new(createSql, connection);
@@ -64,7 +67,7 @@ namespace VillageRentalsProject.Services
         /// Gets the current list of customers from the database
         /// </summary>
         /// <returns>Returns the current list of customers</returns>
-        public List<Customer> GetCustomers()
+        public List<Customer> GetCustomerList()
         {
             List<Customer> customers = new();
             try
@@ -79,13 +82,15 @@ namespace VillageRentalsProject.Services
                 {
                     while (reader.Read())
                     {
-                        Guid customerId = reader.GetGuid(0);
+                        string customerId = reader.GetString(0);
                         string firstName = reader.GetString(1);
                         string lastName = reader.GetString(2);
                         string email = reader.GetString(3);
                         string phoneNumber = reader.GetString(4);
 
-                        Customer customer = new(customerId, firstName, lastName, email, phoneNumber);
+                        Guid customerGuid = Guid.Parse(customerId);
+
+                        Customer customer = new(customerGuid, firstName, lastName, email, phoneNumber);
                         customers.Add(customer);
                     }
                 }
@@ -113,9 +118,9 @@ namespace VillageRentalsProject.Services
                 connection.Open();
 
                 string insertSql = $"INSERT INTO customers (customerId, firstName, lastName, email, phoneNumber) VALUES" +
-                    $"('{customer.CustomerId}', '{customer.FirstName}', '{customer.LastName}', '{customer.Email}', '{customer.PhoneNumber}');";
+                    $"('{customer.CustomerId.ToString()}', '{customer.FirstName}', '{customer.LastName}', '{customer.Email}', '{customer.PhoneNumber}');";
 
-                MySqlCommand insertCommand = new(insertSql);
+                MySqlCommand insertCommand = new(insertSql, connection);
 
                 insertCommand.ExecuteNonQuery();
             }
@@ -141,7 +146,7 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string deleteSql = $"DELTE FROM customers WHERE customerId = '{customer.CustomerId}';";
+                string deleteSql = $"DELETE FROM customers WHERE customerId = '{customer.CustomerId}';";
 
                 MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection);
 
@@ -154,6 +159,51 @@ namespace VillageRentalsProject.Services
             finally
             {
                 connection.Close(); 
+            }
+        }
+        /// <summary>
+        /// Gets the customer from the database by referring to its customerId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Customer GetCustomer(Guid id)
+        {
+            Customer customer = null;
+            try
+            {
+                connection.Open();
+
+                string selectSql = $"SELECT customerId, firstName, lastName, email, phoneNumber FROM customers WHERE customerId = '{id}';";
+
+                MySqlCommand command = new MySqlCommand(selectSql, connection);
+
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        string customerId = reader.GetString(0);
+                        string firstName = reader.GetString(1);
+                        string lastName = reader.GetString(2);
+                        string email = reader.GetString(3);
+                        string phoneNumber = reader.GetString(4);
+
+
+                        Guid customerGuid = Guid.Parse(customerId);
+
+                        customer = new Customer(customerGuid, firstName, lastName, email, phoneNumber);
+                    }
+                }
+
+                return customer;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error has occurred: {ex.Message}");
+                return customer;
+            }
+            finally
+            {
+                connection.Close();
             }
         }
 
