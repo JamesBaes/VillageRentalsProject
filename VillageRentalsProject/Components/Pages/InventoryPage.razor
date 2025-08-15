@@ -1,14 +1,15 @@
 ﻿@page "/inventory"
 
-<div style="display: flex; justify-content: center; height: 64px; position: fixed; margin-left: -32px; top: 0; width: 100%; background-color: #CCCCCC; z-index: 1000">
-	<button type="button" @onclick="() => addEquipmentPage = true" style="height: 36px; width: 20%; border: 2px; border-radius: 4px; background-color: #215456">
-		Add Equipment
-	</button>
-	<button type="button" @onclick="() => addEquipmentPage = false" style="height: 36px; width: 20%; border: 2px; border-radius: 4px; background-color: #215456">
-		Equipment List
-	</button>
+<div style="position: fixed; top: 0; left: 250px; width: calc(100% - 232px); height: 64px; background-color: #CCCCCC; display: flex; justify-content: center; align-items: center; z-index: 1000;">
+	<div style="display: flex; gap: 32px;">
+		<button type="button" @onclick="ShowAddEquipmentPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Add Equipment
+		</button>
+		<button type="button" @onclick="ShowEquipmentListPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Equipment List
+		</button>
+	</div>
 </div>
-
 
 <div style="padding: 4px; margin-top: 64px;">
 	@if (addEquipmentPage)
@@ -34,7 +35,7 @@
 				</div>
 				<div style="margin-bottom: 8px;">
 					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Description:</label>
-					<input style="border: 2px; border-radius: 12px; height: 68px; width: 100%;" type="text" @bind="description" required />
+					<textarea style="border: 2px; border-radius: 12px; height: 68px; width: 100%;" type="text" @bind="description" required />
 				</div>
 				<div style="display: flex; justify-content: center; align-items: center;">
 					<button style="height: 48px; background-color: forestgreen; width: 35%; border-radius: 12px; color: white;" type="submit" @onclick="HandleSubmit" > Save </button>
@@ -42,31 +43,36 @@
 			</form>
 		</div>
 	}
-	@if(!addEquipmentPage)
+	@if (equipmentListPage)
 	{
-		<h3 class="text-center">Equipment List</h3>
-		<hr />
-		@foreach (Equipment equipment in equipmentList)
-		{
-			<div>
-				<h3>$@equipment.Cost</h3>
-				<h3>@equipment.EquipmentName</h3>
-				<p>@equipment.Description</p>
-				<div> 
-					<div> 
-						<h3>Modify Equipment</h3>
-					</div>
-					<div>
-						<h3>Delete Equipment</h3>
+		<h1 style="text-align: center; color: white; font-weight: 600;">Equipment List</h1>
+		<div style="width: 100%; height: 4px; border-radius: 2px; margin-top: 16px; background-color: white;"></div>
+		<div style="width: 100%; gap: 24px;">
+			@foreach (Equipment equipment in equipmentList)
+			{
+				<div style="display: flex; flex-direction: column; padding: 12px; align-items: center; flex: 1; width: 100%; background-color: #cccccc; border-radius: 12px; border: 2px; border-color: white; margin-top: 12px;">
+					<h3 style="font-size: 18px; font-weight: 600;">$@equipment.Cost</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">@equipment.EquipmentName</h3>
+					<p style="font-size: 16px; font-weight: 500;">@equipment.Description</p>
+					<div style="display: flex; flex-direction: row; gap: 24px;"> 
+						<button type="button" @onclick="ShowModifyEquipmentPage" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: dodgerblue;"> 
+							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Modify Equipment</h3>
+						</button>
+						<button type="button" @onclick="async () => await DeleteEquipment(equipment.EquipmentId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
+							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Equipment</h3>
+						</button>
 					</div>
 				</div>
-			</div>
-		}
-		
+			}
+		</div>
+
+	}
+
+	@if (modifyEquipmentPage)
+	{
+		<h1> hello</h1>
 	}
 </div>
-
-
 
 @code {
 
@@ -80,7 +86,38 @@
 	private string description;
 
 	private bool addEquipmentPage = true;
+	private bool equipmentListPage;
+	private bool modifyEquipmentPage;
 
+	private void ShowAddEquipmentPage()
+	{
+		addEquipmentPage = true;
+		equipmentListPage = false;
+		modifyEquipmentPage = false;
+	}
+
+	private void ShowEquipmentListPage()
+	{
+		addEquipmentPage = false;
+		equipmentListPage = true;
+		modifyEquipmentPage = false;
+	}
+
+	private void ShowModifyEquipmentPage()
+	{
+		addEquipmentPage = false;
+		equipmentListPage = false;
+		modifyEquipmentPage = true;
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(100);
+		EquipmentService service = new();
+
+		equipmentList = service.GetEquipmentList();
+	}
 
 
 	public async Task HandleSubmit() 
@@ -91,7 +128,38 @@
 
 		service.AddEquipment(equipment);
 
-		await Task.Delay(2000);
+		await Task.Delay(1000);
+
+	}
+
+	public async Task DeleteEquipment(Guid id)
+	{
+		EquipmentService service = new();
+
+		Equipment deletedEquipment = service.GetEquipment(id);
+
+		List<Equipment> updatedList = new();
+
+		if (deletedEquipment != null)
+		{
+			service.RemoveEquipment(deletedEquipment);
+
+			equipmentList.Remove(deletedEquipment);
+
+			// looping through current equipmentList.
+			// If the removed equipmentId is found during the iteration, it isn't added to the updated list.
+			foreach (Equipment equipment in equipmentList)
+			{
+				if (equipment.EquipmentId != id)
+				{
+					updatedList.Add(equipment);
+				}
+			}
+		}
+
+		equipmentList = updatedList;
+
+		await Task.Delay(100);
 
 	}
 

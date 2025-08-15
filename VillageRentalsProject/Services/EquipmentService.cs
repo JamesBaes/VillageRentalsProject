@@ -67,7 +67,7 @@ namespace VillageRentalsProject.Services
         /// Gets the current list of equipment from the database
         /// </summary>
         /// <returns>Returns the current list of equipment</returns>
-        public List<Equipment> GetEquipment()
+        public List<Equipment> GetEquipmentList()
         {
             List<Equipment> equipmentList = new();
             try
@@ -82,14 +82,16 @@ namespace VillageRentalsProject.Services
                 {
                     while (reader.Read())
                     {
-                        Guid equipmentId = reader.GetGuid(0);
+                        string equipmentId = reader.GetString(0);
                         string categoryId = reader.GetString(1);
                         string equipmentName = reader.GetString(2);
                         string status = reader.GetString(3);
                         string cost = reader.GetString(4);
                         string description = reader.GetString(5);
 
-                        Equipment equipment = new(equipmentId, categoryId, equipmentName, status, cost, description);
+                        Guid equipmentGuid = Guid.Parse(equipmentId);
+
+                        Equipment equipment = new(equipmentGuid, categoryId, equipmentName, status, cost, description);
                         equipmentList.Add(equipment);
                     }
                 }
@@ -139,13 +141,13 @@ namespace VillageRentalsProject.Services
         /// Removes equipment from database
         /// </summary>
         /// <param name="equipment"></param>
-        public void RemoveCustomer(Equipment equipment)
+        public void RemoveEquipment(Equipment equipment)
         {
             try
             {
                 connection.Open();
 
-                string deleteSql = $"DELTE FROM equipment WHERE equipmentId = '{equipment.EquipmentId}';";
+                string deleteSql = $"DELETE FROM equipment WHERE equipmentId = '{equipment.EquipmentId}';";
 
                 MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection);
 
@@ -154,6 +156,52 @@ namespace VillageRentalsProject.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"An error has occured: {ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Gets the equipment from the database by referring to its equipmentId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Equipment GetEquipment(Guid id)
+        {
+            Equipment equipment = null;
+            try
+            {
+                connection.Open();
+
+                string selectSql = $"SELECT equipmentId, categoryId, equipmentName, status, cost, description FROM equipment WHERE equipmentId = '{id}';";
+
+                MySqlCommand command = new MySqlCommand(selectSql, connection);
+
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        string equipmentId = reader.GetString(0);
+                        string categoryId = reader.GetString(1);
+                        string equipmentName = reader.GetString(2);
+                        string status = reader.GetString(3);
+                        string cost = reader.GetString(4);
+                        string description = reader.GetString(5);
+
+                        Guid equipmentGuid = Guid.Parse(equipmentId);
+
+                        equipment = new Equipment(equipmentGuid, categoryId, equipmentName, status, cost, description);
+                    }
+                }
+
+                return equipment;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error has occurred: {ex.Message}");
+                return equipment;
             }
             finally
             {
