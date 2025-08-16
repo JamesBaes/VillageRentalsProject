@@ -51,7 +51,7 @@ namespace VillageRentalsProject.Services
                 categoryId VARCHAR(255), 
                 equipmentName VARCHAR(255),
                 status VARCHAR(255),
-                cost VARCHAR(255),
+                dailyRate VARCHAR(255),
                 description VARCHAR(255)
                 );";
 
@@ -86,12 +86,12 @@ namespace VillageRentalsProject.Services
                         string categoryId = reader.GetString(1);
                         string equipmentName = reader.GetString(2);
                         string status = reader.GetString(3);
-                        string cost = reader.GetString(4);
+                        string dailyRate = reader.GetString(4);
                         string description = reader.GetString(5);
 
                         Guid equipmentGuid = Guid.Parse(equipmentId);
 
-                        Equipment equipment = new(equipmentGuid, categoryId, equipmentName, status, cost, description);
+                        Equipment equipment = new(equipmentGuid, categoryId, equipmentName, status, dailyRate, description);
                         equipmentList.Add(equipment);
                     }
                 }
@@ -118,8 +118,8 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string insertSql = $"INSERT INTO equipment (equipmentId, categoryId, equipmentName, status, cost, description) VALUES" +
-                    $"('{equipment.EquipmentId.ToString()}', '{equipment.CategoryId}', '{equipment.EquipmentName}', '{equipment.Status}', '{equipment.Cost}', '{equipment.Description}');";
+                string insertSql = $"INSERT INTO equipment (equipmentId, categoryId, equipmentName, status, dailyRate, description) VALUES" +
+                    $"('{equipment.EquipmentId.ToString()}', '{equipment.CategoryId}', '{equipment.EquipmentName}', '{equipment.Status}', '{equipment.DailyRate}', '{equipment.Description}');";
 
                 MySqlCommand insertCommand = new(insertSql, connection);
 
@@ -187,12 +187,12 @@ namespace VillageRentalsProject.Services
                         string categoryId = reader.GetString(1);
                         string equipmentName = reader.GetString(2);
                         string status = reader.GetString(3);
-                        string cost = reader.GetString(4);
+                        string dailyRate = reader.GetString(4);
                         string description = reader.GetString(5);
 
                         Guid equipmentGuid = Guid.Parse(equipmentId);
 
-                        equipment = new Equipment(equipmentGuid, categoryId, equipmentName, status, cost, description);
+                        equipment = new Equipment(equipmentGuid, categoryId, equipmentName, status, dailyRate, description);
                     }
                 }
 

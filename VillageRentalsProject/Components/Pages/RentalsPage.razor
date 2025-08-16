@@ -1,7 +1,185 @@
 ﻿@page "/rentals"
 
-<h3>Rentals</h3>
+<div style="position: fixed; top: 0; left: 250px; width: calc(100% - 232px); height: 64px; background-color: #CCCCCC; display: flex; justify-content: center; align-items: center; z-index: 1000;">
+	<div style="display: flex; gap: 32px;">
+		<button type="button" @onclick="ShowAddRentalPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Rent Equipment
+		</button>
+		<button type="button" @onclick="ShowRentalListPage" style="height: 36px; width: 160px; border: 2px solid #215456; border-radius: 4px; background-color: #215456; color: white; font-weight: 600;">
+			Rentals List
+		</button>
+	</div>
+</div>
+
+<div style="padding: 4px; margin-top: 64px;">
+	@if (addRentalPage)
+	{
+		<h1 style="color: white; text-align: center; font-weight: 600;">Rent Equipment</h1>
+		<div style="display: flex; justify-content: center; align-items: center;">
+			<form style="display: flex; gap: 16px; flex-direction: column; width: 90%;">
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Customer:</label>
+					<select style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" @bind="customerId" required>
+						<option value="">Select Customer</option>
+						@foreach (Customer customer in customerList)
+						{
+							<option value="@customer.CustomerId">@($"{customer.FirstName} {customer.LastName}")</option>
+						}
+					</select>
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Equipment:</label>
+					<select style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" @bind="equipmentId" required>
+						<option value="">Select Equipment</option>
+						@foreach (Equipment equipment in equipmentList)
+						{
+							<option value="@equipment.EquipmentId">@equipment.EquipmentName</option>
+						}
+					</select>
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Rental Date:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="date" @bind="rentalDate" required min="@todayString" />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Return Date:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="date" @bind="returnDate" required min="@todayString" />
+				</div>
+				<div style="margin-bottom: 8px;">
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Cost:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="cost" required />
+				</div>
+				<div style="display: flex; justify-content: center; align-items: center;">
+					<button style="height: 48px; background-color: forestgreen; width: 35%; border-radius: 12px; color: white;" type="submit" @onclick="HandleSubmit"> Save </button>
+				</div>
+			</form>
+		</div>
+	}
+	@if (rentalsListPage)
+	{
+		<h1 style="text-align: center; color: white; font-weight: 600;">Rentals List</h1>
+		<div style="width: 100%; height: 4px; border-radius: 2px; margin-top: 16px; background-color: white;"></div>
+		<div style="width: 100%; gap: 24px;">
+			@foreach (Rental rental in rentalsList)
+			{
+				Customer customer = customerList.First(customer => customer.CustomerId == rental.CustomerId);
+				Equipment equipment = equipmentList.First(equipment => equipment.EquipmentId == rental.EquipmentId);
+
+				<div style="display: flex; flex-direction: column; padding: 12px; align-items: center; flex: 1; width: 100%; background-color: #cccccc; border-radius: 12px; border: 2px; border-color: white; margin-top: 12px;">
+					<h3 style="font-size: 18px; font-weight: 600; text-align: center;">Rental Id: @rental.RentalId</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">@($"{customer.FirstName} {customer.LastName}")</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">Rented Equipment: @equipment.EquipmentName</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">Rental Date: @rental.RentalDate.ToString("MMMM dd yyyy")</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">Return Date: @rental.ReturnDate.ToString("MMMM dd yyyy")</h3>
+					<button type="button" @onclick="async () => await DeleteRental(rental.RentalId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
+						<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Customer</h3>
+					</button>
+				</div>
+			}
+		</div>
+	}
+</div>
+
 
 @code {
 
-}
+	public List<Rental> rentalsList = new();
+	public List<Customer> customerList = new();
+	public List<Equipment> equipmentList = new();
+
+	private Guid rentalId;
+	private DateTime currentDate = DateTime.Today;
+	private Guid customerId;
+	private Guid equipmentId;
+	private DateTime rentalDate = DateTime.Today;
+	private DateTime returnDate = DateTime.Today;
+	private string cost;
+
+
+	// string value for min value of the date inputs
+	private string todayString = DateTime.Today.ToString("yyyy-MM-dd");
+
+	private bool addRentalPage = true;
+	private bool rentalsListPage;
+
+
+	private void ShowAddRentalPage()
+	{
+		addRentalPage = true;
+		rentalsListPage = false;
+	}
+
+	private void ShowRentalListPage()
+	{
+		addRentalPage = false;
+		rentalsListPage = true;
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(100);
+		RentalService rentalService = new();
+		CustomerService customerService = new();
+		EquipmentService equipmentService = new();
+
+		rentalsList = rentalService.GetRentalsList();
+		customerList = customerService.GetCustomerList();
+		equipmentList = equipmentService.GetEquipmentList();
+	}
+
+
+	public async Task HandleSubmit()
+	{
+		RentalService service = new();
+
+		try
+		{
+			Customer selectedCustomer = customerList.First(customer => customer.CustomerId == customerId);
+			Equipment selectedEquipment = equipmentList.First(equipment => equipment.EquipmentId == equipmentId);
+			Rental rental = new(rentalId = Guid.NewGuid(), currentDate, customerId, equipmentId, rentalDate, returnDate, cost);
+
+			service.AddRental(rental, selectedCustomer, selectedEquipment);
+
+			await Task.Delay(1000);
+		}
+		catch
+		{
+			throw new Exception();
+		};
+	}
+
+
+	public async Task DeleteRental(Guid id)
+	{
+		RentalService service = new();
+
+		Rental deletedRental = service.GetRental(id);
+
+		List<Rental> updatedList = new();
+
+		if (deletedRental != null)
+		{
+			service.RemoveRental(deletedRental);
+
+			rentalsList.Remove(deletedRental);
+
+			// looping through current customerList.
+			// If the removed customerId is found during the iteration, it isn't added to the updated list.
+			foreach (Rental rental in rentalsList)
+			{
+				if (rental.RentalId != id)
+				{
+					updatedList.Add(rental);
+				}
+			}
+		}
+
+		rentalsList = updatedList;
+
+		await Task.Delay(100);
+
+	}
+
+	}
+

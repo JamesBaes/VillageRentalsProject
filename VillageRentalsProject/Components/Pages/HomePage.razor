@@ -1,14 +1,12 @@
 ﻿@page "/"
 
-<div style="display: flex; flex-direction: column; padding: 128px; height: 500px" class="navbar-color">
-    <img src="images/logo.png" style="max-width: 100%; height: 50%;" />
-    <h2 style="font-weight: 800; font-size: 72px;">Village Rentals</h2>
-    <h3>
-        Anothony Nwachukwu Ogamba
-        Eno Attah Ekpenyong
-        James Baes
-        Samir Karki
-    </h3>
+<div style="display: flex; flex: 1; flex-direction: column;  margin-top: 64px; padding: 32px; align-items: center; color: white; gap: 12px;" class="navbar-color">
+    <img src="images/logo.png" style="width: 40%; height: 15%;" />
+    <h2 style="font-weight: 800; font-size: 54px;">Village Rentals</h2> 
+    <h4 style="color: white;">Anothony Nwachukwu Ogamba</h4>
+    <h4 style="color: white;">Eno Attah Ekpenyong</h4>
+    <h4 style="color: white;">James Baes</h4>
+    <h4 style="color: white;">Samir Karki</h4>
 </div>
 
 
@@ -32,7 +30,19 @@
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Reservation initialization failed: {ex.Message}");
+            Console.Error.WriteLine($"Reservation Database initialization failed: {ex.Message}");
         }
+
+        try
+        {
+            RentalService service = new();
+            service.InitializeRentalsDb();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Rentals Database initialization failed: {ex.Message}");
+        }
+
+        await Task.Delay(100);
     }
 }

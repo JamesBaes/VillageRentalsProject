@@ -30,8 +30,8 @@
 					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="status" required />
 				</div>
 				<div style="margin-bottom: 8px;">
-					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Cost:</label>
-					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="cost" required />
+					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Daily Rate:</label>
+					<input style="border: 2px; border-radius: 12px; height: 36px; width: 100%;" type="text" @bind="dailyRate" required />
 				</div>
 				<div style="margin-bottom: 8px;">
 					<label style="color: white; font-size: 18px; font-weight: 500; margin-bottom: 6px;">Description:</label>
@@ -51,26 +51,16 @@
 			@foreach (Equipment equipment in equipmentList)
 			{
 				<div style="display: flex; flex-direction: column; padding: 12px; align-items: center; flex: 1; width: 100%; background-color: #cccccc; border-radius: 12px; border: 2px; border-color: white; margin-top: 12px;">
-					<h3 style="font-size: 18px; font-weight: 600;">$@equipment.Cost</h3>
+					<h3 style="font-size: 18px; font-weight: 600;">$@equipment.DailyRate</h3>
 					<h3 style="font-size: 18px; font-weight: 600;">@equipment.EquipmentName</h3>
-					<p style="font-size: 16px; font-weight: 500;">@equipment.Description</p>
-					<div style="display: flex; flex-direction: row; gap: 24px;"> 
-						<button type="button" @onclick="ShowModifyEquipmentPage" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: dodgerblue;"> 
-							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Modify Equipment</h3>
-						</button>
-						<button type="button" @onclick="async () => await DeleteEquipment(equipment.EquipmentId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
-							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Equipment</h3>
-						</button>
-					</div>
+					<p style="font-size: 16px; font-weight: 500;">@equipment.Description</p> 
+					<button type="button" @onclick="async () => await DeleteEquipment(equipment.EquipmentId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
+						<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Equipment</h3>
+					</button>
 				</div>
 			}
 		</div>
 
-	}
-
-	@if (modifyEquipmentPage)
-	{
-		<h1> hello</h1>
 	}
 </div>
 
@@ -82,7 +72,7 @@
 	private string categoryId;
 	private string equipmentName;
 	private string status;
-	private string cost;
+	private string dailyRate;
 	private string description;
 
 	private bool addEquipmentPage = true;
@@ -124,7 +114,7 @@
 	{
 		EquipmentService service = new();
 
-		Equipment equipment = new Equipment(equipmentId = Guid.NewGuid(), categoryId, equipmentName, status, cost, description);
+		Equipment equipment = new Equipment(equipmentId = Guid.NewGuid(), categoryId, equipmentName, status, dailyRate, description);
 
 		service.AddEquipment(equipment);
 

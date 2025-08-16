@@ -50,14 +50,9 @@
 					<h3 style="font-size: 18px; font-weight: 600;">Customer Id: @customer.CustomerId</h3>
 					<h3 style="font-size: 18px; font-weight: 600;">@($"{customer.FirstName} {customer.LastName}")</h3>
 					<p style="font-size: 16px; font-weight: 500;">@customer.Email</p>
-					<div style="display: flex; flex-direction: row; gap: 24px;">
-						<button type="button" @onclick="ShowModifyCustomerPage" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: dodgerblue;">
-							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Modify Customer</h3>
-						</button>
-						<button type="button" @onclick="async () => await DeleteCustomer(customer.CustomerId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
-							<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Customer</h3>
-						</button>
-					</div>
+					<button type="button" @onclick="async () => await DeleteCustomer(customer.CustomerId)" style="border: 1.5px solid white; display: flex; width: 156px; height: 36px; justify-content: center; align-items: center; border-radius: 12px; background-color: firebrick">
+						<h3 style="color: white; text-align: center; font-size: 14px; font-weight: 600;">Delete Customer</h3>
+					</button>	
 				</div>
 			}
 		</div>
