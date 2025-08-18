@@ -59,10 +59,6 @@
 
 	}
 
-	@if (modifyCustomerPage)
-	{
-		<h1> hello</h1>
-	}
 </div>
 
 @code {
@@ -91,13 +87,6 @@
 		addCustomerPage = false;
 		customerListPage = true;
 		modifyCustomerPage = false;
-	}
-
-	private void ShowModifyCustomerPage()
-	{
-		addCustomerPage = false;
-		customerListPage = false;
-		modifyCustomerPage = true;
 	}
 
 
@@ -135,19 +124,9 @@
 			service.RemoveCustomer(deletedCustomer);
 
 			customerList.Remove(deletedCustomer);
-
-			// looping through current customerList.
-			// If the removed customerId is found during the iteration, it isn't added to the updated list.
-			foreach (Customer customer in customerList)
-			{
-				if (customer.CustomerId != id)
-				{
-					updatedList.Add(customer);
-				}
-			}
 		}
 
-		customerList = updatedList;
+		customerList = service.GetCustomerList();
 
 		await Task.Delay(100);
 

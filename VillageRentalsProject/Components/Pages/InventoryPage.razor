@@ -93,13 +93,6 @@
 		modifyEquipmentPage = false;
 	}
 
-	private void ShowModifyEquipmentPage()
-	{
-		addEquipmentPage = false;
-		equipmentListPage = false;
-		modifyEquipmentPage = true;
-	}
-
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -135,19 +128,9 @@
 			service.RemoveEquipment(deletedEquipment);
 
 			equipmentList.Remove(deletedEquipment);
-
-			// looping through current equipmentList.
-			// If the removed equipmentId is found during the iteration, it isn't added to the updated list.
-			foreach (Equipment equipment in equipmentList)
-			{
-				if (equipment.EquipmentId != id)
-				{
-					updatedList.Add(equipment);
-				}
-			}
 		}
 
-		equipmentList = updatedList;
+		equipmentList = service.GetEquipmentList();
 
 		await Task.Delay(100);
 

@@ -147,7 +147,7 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string deleteSql = $"DELETE FROM equipment WHERE equipmentId = '{equipment.EquipmentId}';";
+                string deleteSql = $"DELETE FROM equipment WHERE equipmentId = '{equipment.EquipmentId.ToString()}';";
 
                 MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection);
 
@@ -155,7 +155,8 @@ namespace VillageRentalsProject.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error has occured: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"An error has occured: {ex.Message}");
+
             }
             finally
             {
@@ -175,7 +176,7 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string selectSql = $"SELECT equipmentId, categoryId, equipmentName, status, cost, description FROM equipment WHERE equipmentId = '{id}';";
+                string selectSql = $"SELECT equipmentId, categoryId, equipmentName, status, dailyRate, description FROM equipment WHERE equipmentId = '{id}';";
 
                 MySqlCommand command = new MySqlCommand(selectSql, connection);
 
