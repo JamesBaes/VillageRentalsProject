@@ -147,7 +147,7 @@ namespace VillageRentalsProject.Services
             {
                 connection.Open();
 
-                string deleteSql = $"DELETE FROM equipment WHERE equipmentId = '{equipment.EquipmentId.ToString()}';";
+                string deleteSql = $"DELETE FROM equipment WHERE equipmentId = '{equipment.EquipmentId}';";
 
                 MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection);
 
